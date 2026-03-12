@@ -18,6 +18,12 @@ page {
   color: var(--ant-text-secondary);
 }
 
+.exam-meta {
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--ant-text-tertiary);
+}
+
 .score-panel {
   padding: 30rpx 24rpx 26rpx;
   border-radius: 20rpx;
@@ -40,6 +46,37 @@ page {
   text-align: center;
 }
 
+.score-unit {
+  font-size: 40rpx;
+}
+
+.score-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 128rpx;
+  margin-top: 18rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #d9e1ea;
+  background: #fafbfd;
+  font-size: 24rpx;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.score-status--passed {
+  border-color: #d9f0c7;
+  background: #f6ffed;
+  color: #389e0d;
+}
+
+.score-status--failed {
+  border-color: #ffd8bf;
+  background: #fff7e6;
+  color: #d46b08;
+}
+
 .score-label {
   margin-top: 8rpx;
   font-size: 24rpx;
@@ -48,7 +85,8 @@ page {
 }
 
 .summary-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16rpx;
   margin-top: 24rpx;
 }
@@ -196,6 +234,12 @@ page {
   border-color: #ffd8bf;
   background: #fff7e6;
   color: #d46b08;
+}
+
+.result-state--unanswered {
+  border-color: #d9e1ea;
+  background: #f5f7fa;
+  color: #667085;
 }
 
 .result-stem,

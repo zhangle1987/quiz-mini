@@ -114,30 +114,35 @@ page {
   color: #2f63b8;
 }
 
-.count-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.paper-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16rpx;
 }
 
-.count-chip {
-  min-width: 140rpx;
-  padding: 16rpx 22rpx;
-  border: 1rpx solid var(--ant-border-light);
-  border-radius: 999rpx;
-  background: #ffffff;
-  text-align: center;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: var(--ant-text-secondary);
+.paper-config-card {
+  padding: 20rpx 18rpx;
+  border-radius: 18rpx;
+  border: 1rpx solid #edf1f5;
+  background: #fbfcfe;
 }
 
-.count-chip--active {
-  border-color: #91caff;
-  background: #e6f4ff;
-  color: #1677ff;
-  box-shadow: 0 10rpx 22rpx rgba(22, 119, 255, 0.08);
+.paper-config-card--wide {
+  grid-column: span 2;
+}
+
+.paper-config-card__label {
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--ant-text-tertiary);
+}
+
+.paper-config-card__value {
+  margin-top: 10rpx;
+  font-size: 32rpx;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--ant-text);
 }
 
 .action-row {

@@ -8,9 +8,13 @@ export function getServerOrigin() {
 
 export function request({ url, method = "GET", data, header = {} }) {
   return new Promise((resolve, reject) => {
+    const upperMethod = String(method || "GET").toUpperCase();
+    const requestUrl = upperMethod === "GET"
+      ? `${getApiBaseUrl()}${url}${url.includes("?") ? "&" : "?"}_t=${Date.now()}`
+      : `${getApiBaseUrl()}${url}`;
     wx.request({
-      url: `${getApiBaseUrl()}${url}`,
-      method,
+      url: requestUrl,
+      method: upperMethod,
       data,
       header,
       success(res) {

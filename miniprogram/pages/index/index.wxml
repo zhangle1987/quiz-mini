@@ -3,7 +3,7 @@
     <view class="page-header__eyebrow">题库刷题</view>
     <view class="page-header__title">先选试卷，再开始练习</view>
     <view class="page-header__desc">
-      选择题库和题量后即可开始答题，交卷后可以直接查看答案和解析。
+      选择题库后开始限时答题，系统会按后台配置随机抽题，到时自动交卷。
     </view>
   </view>
 
@@ -19,20 +19,29 @@
           data-id="{{item.id}}"
         >
           <view class="paper-item__title">{{item.title}}</view>
-          <view class="paper-item__meta">{{item.questionCount}} 题</view>
+          <view class="paper-item__meta">题库共 {{item.questionCount}} 题</view>
+          <view class="paper-item__meta">
+            抽取 {{item.quizConfig.questionCount}} 题 · {{item.quizConfig.durationMinutes}} 分钟 · {{item.quizConfig.passThreshold}}% 合格
+          </view>
         </view>
       </view>
 
-      <view class="section-label section-label--gap">选择题量</view>
-      <view class="count-row">
+      <view class="section-label section-label--gap" wx:if="{{selectedPaper}}">考试配置</view>
+      <view class="paper-config-grid" wx:if="{{selectedPaper}}">
         <view
-          wx:for="{{countOptions}}"
-          wx:key="value"
-          class="count-chip {{selectedCount === item.value ? 'count-chip--active' : ''}}"
-          bindtap="selectCount"
-          data-value="{{item.value}}"
+          class="paper-config-card"
+          bindtap="tapQuestionCountConfig"
         >
-          {{item.label}}
+          <view class="paper-config-card__label">抽题数量</view>
+          <view class="paper-config-card__value">{{selectedPaper.quizConfig.questionCount}}</view>
+        </view>
+        <view class="paper-config-card">
+          <view class="paper-config-card__label">答题时长</view>
+          <view class="paper-config-card__value">{{selectedPaper.quizConfig.durationMinutes}} 分钟</view>
+        </view>
+        <view class="paper-config-card paper-config-card--wide">
+          <view class="paper-config-card__label">合格线</view>
+          <view class="paper-config-card__value">{{selectedPaper.quizConfig.passThreshold}}%</view>
         </view>
       </view>
 

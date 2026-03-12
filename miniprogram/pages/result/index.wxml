@@ -6,10 +6,16 @@
     <view class="ui-card__body">
       <view class="result-overview">
         <view class="paper-title">{{result.paper.title}}</view>
+        <view class="exam-meta">
+          抽取 {{result.paper.quizConfig.questionCount}} 题 · 限时 {{result.paper.quizConfig.durationMinutes}} 分钟 · 合格线 {{result.summary.passThreshold}}%
+        </view>
         <view class="score-panel">
-          <view class="score-panel__caption">本次得分</view>
-          <view class="score">{{result.summary.score}}</view>
-          <view class="score-label">总分</view>
+          <view class="score-panel__caption">本次正确率</view>
+          <view class="score">{{result.summary.accuracy}}<text class="score-unit">%</text></view>
+          <view class="score-status {{result.summary.passed ? 'score-status--passed' : 'score-status--failed'}}">
+            {{result.summary.passed ? '合格' : '不合格'}}
+          </view>
+          <view class="score-label" wx:if="{{result.summary.autoSubmitted}}">答题时间结束，系统已自动交卷</view>
         </view>
 
         <view class="summary-grid">
@@ -18,12 +24,16 @@
             <view class="summary-item__value">{{result.summary.total}}</view>
           </view>
           <view class="summary-item">
+            <view class="summary-item__label">已作答</view>
+            <view class="summary-item__value">{{result.summary.answeredCount}}</view>
+          </view>
+          <view class="summary-item">
             <view class="summary-item__label">答对</view>
             <view class="summary-item__value">{{result.summary.correctCount}}</view>
           </view>
           <view class="summary-item">
-            <view class="summary-item__label">答错</view>
-            <view class="summary-item__value">{{result.summary.wrongCount}}</view>
+            <view class="summary-item__label">未作答</view>
+            <view class="summary-item__value">{{result.summary.unansweredCount}}</view>
           </view>
         </view>
       </view>
@@ -33,23 +43,20 @@
   <view class="card-gap"></view>
 
   <view class="ui-card" wx:if="{{broker}}">
-    <view class="ui-card__head">
-      <view class="ui-card__title">加微信好友</view>
-    </view>
     <view class="ui-card__body">
       <view class="broker-card broker-card--framed">
-        <view class="broker-title">{{broker.name || broker.brokerId}}</view>
+        <!-- <view class="broker-title">{{broker.name || broker.brokerId}}</view>
         <view class="broker-desc">
           答题结束后可直接添加微信沟通，二维码由后台维护。
-        </view>
+        </view> -->
+        <view class="broker-desc">长按添加微信好友咨询</view>
         <image
-          wx:if="{{broker.qrImageUrl}}"
           class="broker-qr"
           src="{{broker.qrImageUrl}}"
           mode="aspectFit"
+          show-menu-by-longpress="{{true}}"
           bindtap="previewBrokerQr"
         />
-        <view class="broker-empty" wx:else>后台暂未上传二维码图片</view>
       </view>
     </view>
   </view>
@@ -69,15 +76,15 @@
               <view class="result-number">题目 {{item.number}}</view>
               <view class="result-reference" wx:if="{{item.reference}}">{{item.reference}}</view>
             </view>
-            <view class="result-state {{item.isCorrect ? 'result-state--correct' : 'result-state--wrong'}}">
-              {{item.isCorrect ? '正确' : '错误'}}
+            <view class="result-state {{item.statusClass}}">
+              {{item.statusLabel}}
             </view>
           </view>
           <view class="result-stem">{{item.stem}}</view>
           <view class="result-answer-grid">
             <view class="result-answer-card">
               <view class="result-answer-card__label">你的答案</view>
-              <view class="result-answer-card__value">{{item.userAnswer}}</view>
+              <view class="result-answer-card__value">{{item.userAnswerLabel}}</view>
             </view>
             <view class="result-answer-card">
               <view class="result-answer-card__label">正确答案</view>

@@ -7,10 +7,26 @@
       <view class="meta-row">
         <view class="ui-tag ui-tag--light">第 {{currentIndex + 1}} / {{questions.length}} 题</view>
         <view class="ui-tag ui-tag--primary-light">已答 {{answeredCount}} 题</view>
+        <view class="ui-tag ui-tag--danger-light {{remainingSeconds <= 300 ? 'timer-tag--urgent' : ''}}">
+          剩余 {{timerText}}
+        </view>
+      </view>
+      <view class="quiz-summary">
+        本次随机抽取 {{quizConfig.questionCount}} 题，限时 {{quizConfig.durationMinutes}} 分钟，正确率达到 {{quizConfig.passThreshold}}% 为合格
       </view>
       <view class="progress-wrap">
-        <view class="ui-progress">
-          <view class="ui-progress__bar" style="width: {{progressPercent}}%;"></view>
+        <view class="progress-meta">
+          <view class="progress-title">答题进度</view>
+          <view class="progress-value">{{answeredCount}} / {{questions.length}}</view>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{progressPercent}}%;">
+            <view class="progress-fill__glow"></view>
+          </view>
+        </view>
+        <view class="progress-caption">
+          <view class="progress-caption__text">当前进度 {{progressPercent}}%</view>
+          <view class="progress-caption__text">剩余 {{questions.length - answeredCount}} 题</view>
         </view>
       </view>
     </view>
@@ -44,8 +60,7 @@
           </view>
           <view class="quiz-option__content">
             <view class="quiz-option__line">
-              <view class="quiz-option__badge">{{item.value}}</view>
-              <view class="quiz-option__label">{{item.text}}</view>
+              <view class="quiz-option__label">{{item.value}} {{item.text}}</view>
             </view>
           </view>
         </view>
