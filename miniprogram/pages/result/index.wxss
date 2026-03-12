@@ -6,23 +6,42 @@ page {
   padding: 24rpx 24rpx 156rpx;
 }
 
+.result-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+}
+
 .paper-title {
   font-size: 26rpx;
   line-height: 1.7;
   color: var(--ant-text-secondary);
 }
 
+.score-panel {
+  padding: 30rpx 24rpx 26rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #e9edf2;
+  background: linear-gradient(180deg, #fcfdff 0%, #f8fafc 100%);
+  text-align: center;
+}
+
+.score-panel__caption {
+  font-size: 24rpx;
+  color: var(--ant-text-tertiary);
+}
+
 .score {
-  margin-top: 16rpx;
-  font-size: 88rpx;
+  margin-top: 14rpx;
+  font-size: 92rpx;
   line-height: 1;
   font-weight: 700;
-  color: var(--ant-primary);
+  color: #1f2937;
   text-align: center;
 }
 
 .score-label {
-  margin-top: 10rpx;
+  margin-top: 8rpx;
   font-size: 24rpx;
   text-align: center;
   color: var(--ant-text-tertiary);
@@ -36,10 +55,10 @@ page {
 
 .summary-item {
   flex: 1;
-  padding: 20rpx 12rpx;
+  padding: 22rpx 14rpx;
   border-radius: 16rpx;
-  background: #f8fbff;
-  border: 1rpx solid #edf2fa;
+  background: #fbfcfe;
+  border: 1rpx solid #edf1f5;
 }
 
 .summary-item__label {
@@ -68,6 +87,13 @@ page {
   padding: 8rpx 0 4rpx;
 }
 
+.broker-card--framed {
+  padding: 22rpx 20rpx 18rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #edf1f5;
+  background: #fbfcfe;
+}
+
 .broker-title {
   font-size: 30rpx;
   font-weight: 600;
@@ -88,7 +114,7 @@ page {
   margin-top: 20rpx;
   border-radius: 24rpx;
   background: #ffffff;
-  border: 1rpx solid var(--ant-border-light);
+  border: 1rpx solid #e8edf3;
 }
 
 .broker-empty {
@@ -96,25 +122,36 @@ page {
   padding: 24rpx;
   width: 100%;
   border-radius: 16rpx;
-  background: #fafafa;
+  background: #ffffff;
+  border: 1rpx dashed #d7dfe7;
   text-align: center;
   color: var(--ant-text-tertiary);
 }
 
-.result-block {
-  padding: 24rpx 24rpx;
-  border-bottom: 1rpx solid var(--ant-border-light);
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
 
-.result-block:last-child {
-  border-bottom: 0;
+.result-block {
+  padding: 22rpx 22rpx 20rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #edf1f5;
+  background: #ffffff;
 }
 
 .result-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16rpx;
+}
+
+.result-head__main {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
 }
 
 .result-number {
@@ -123,20 +160,85 @@ page {
   color: var(--ant-text);
 }
 
+.result-reference {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #eaedf1;
+  background: #f8fafc;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--ant-text-tertiary);
+}
+
+.result-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #d9e1ea;
+  background: #fafbfd;
+  font-size: 22rpx;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #475569;
+}
+
+.result-state--correct {
+  border-color: #d9f0c7;
+  background: #f6ffed;
+  color: #389e0d;
+}
+
+.result-state--wrong {
+  border-color: #ffd8bf;
+  background: #fff7e6;
+  color: #d46b08;
+}
+
 .result-stem,
-.result-row,
 .result-explanation {
-  margin-top: 14rpx;
+  margin-top: 16rpx;
   font-size: 28rpx;
   line-height: 1.7;
   color: var(--ant-text-secondary);
 }
 
-.result-explanation {
-  padding: 18rpx 20rpx;
+.result-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.result-answer-card {
+  padding: 16rpx 18rpx;
   border-radius: 16rpx;
-  background: #f7faff;
-  border: 1rpx solid #edf2fa;
+  border: 1rpx solid #edf1f5;
+  background: #fbfcfe;
+}
+
+.result-answer-card__label {
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--ant-text-tertiary);
+}
+
+.result-answer-card__value {
+  margin-top: 8rpx;
+  font-size: 30rpx;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--ant-text);
+}
+
+.result-explanation {
+  padding: 18rpx 20rpx 20rpx;
+  border-radius: 18rpx;
+  background: #fbfcfe;
+  border: 1rpx solid #edf1f5;
 }
 
 .result-explanation__title {

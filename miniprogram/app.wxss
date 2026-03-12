@@ -71,3 +71,129 @@ page {
   justify-content: flex-start;
   color: var(--ant-text);
 }
+
+.ui-card {
+  overflow: hidden;
+  border-radius: 24rpx;
+  border: 1rpx solid var(--ant-border-light);
+  background: var(--ant-bg-elevated);
+  box-shadow: var(--ant-shadow);
+}
+
+.ui-card__head {
+  padding: 24rpx 24rpx 0;
+}
+
+.ui-card__title {
+  font-size: 32rpx;
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--ant-text);
+}
+
+.ui-card__body {
+  padding: 24rpx;
+}
+
+.ui-card__body--tight {
+  padding-top: 0;
+}
+
+.ui-card__body--flush {
+  padding: 0;
+}
+
+.ui-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.ui-tag--light {
+  background: #f5f5f5;
+  color: #595959;
+}
+
+.ui-tag--primary-light {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.ui-tag--success-light {
+  background: #f6ffed;
+  color: #389e0d;
+}
+
+.ui-tag--danger-light {
+  background: #fff2f0;
+  color: #cf1322;
+}
+
+.ui-progress {
+  height: 16rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: var(--progress-trail-color);
+}
+
+.ui-progress__bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--progress-stroke-color);
+  transition: width 0.25s ease;
+}
+
+button.ui-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 0;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+  font-size: 32rpx;
+  line-height: 1;
+  font-weight: 600;
+}
+
+button.ui-button::after {
+  border: 0;
+}
+
+button.ui-button.ui-button--primary {
+  color: #ffffff;
+  background: #1677ff;
+  box-shadow: 0 10rpx 20rpx rgba(22, 119, 255, 0.16);
+}
+
+button.ui-button.ui-button--default {
+  color: #434343;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2rpx #d9d9d9;
+}
+
+button.ui-button.ui-button--small {
+  width: auto;
+  min-width: 132rpx;
+  height: 68rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+button.ui-button.ui-button--hover {
+  filter: brightness(0.96);
+}
+
+button.ui-button[disabled] {
+  opacity: 0.45;
+  color: #bfbfbf;
+  background: #f5f5f5;
+  box-shadow: none;
+}

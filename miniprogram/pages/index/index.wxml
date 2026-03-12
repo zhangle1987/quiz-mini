@@ -3,41 +3,42 @@
     <view class="page-header__eyebrow">题库刷题</view>
     <view class="page-header__title">先选试卷，再开始练习</view>
     <view class="page-header__desc">
-      描述描述描述
+      选择题库和题量后即可开始答题，交卷后可以直接查看答案和解析。
     </view>
   </view>
 
-  <ant-card title="">
-    <view class="section-label">选择题库</view>
-    <view class="paper-list">
-      <view
-        wx:for="{{papers}}"
-        wx:key="id"
-        class="paper-item {{selectedPaperId === item.id ? 'paper-item--active' : ''}}"
-        bindtap="selectPaper"
-        data-id="{{item.id}}"
-      >
-        <view class="paper-item__badge" wx:if="{{selectedPaperId === item.id}}">当前题库</view>
-        <view class="paper-item__title">{{item.title}}</view>
-        <view class="paper-item__meta">{{item.questionCount}} 题</view>
+  <view class="ui-card">
+    <view class="ui-card__body">
+      <view class="section-label">选择题库</view>
+      <view class="paper-list">
+        <view
+          wx:for="{{papers}}"
+          wx:key="id"
+          class="paper-item {{selectedPaperId === item.id ? 'paper-item--active' : ''}}"
+          bindtap="selectPaper"
+          data-id="{{item.id}}"
+        >
+          <view class="paper-item__title">{{item.title}}</view>
+          <view class="paper-item__meta">{{item.questionCount}} 题</view>
+        </view>
+      </view>
+
+      <view class="section-label section-label--gap">选择题量</view>
+      <view class="count-row">
+        <view
+          wx:for="{{countOptions}}"
+          wx:key="value"
+          class="count-chip {{selectedCount === item.value ? 'count-chip--active' : ''}}"
+          bindtap="selectCount"
+          data-value="{{item.value}}"
+        >
+          {{item.label}}
+        </view>
+      </view>
+
+      <view class="action-row">
+        <button class="ui-button ui-button--primary" loading="{{loading}}" bindtap="startQuiz">开始答题</button>
       </view>
     </view>
-
-    <view class="section-label section-label--gap">选择题量</view>
-    <view class="count-row">
-      <view
-        wx:for="{{countOptions}}"
-        wx:key="value"
-        class="count-chip {{selectedCount === item.value ? 'count-chip--active' : ''}}"
-        bindtap="selectCount"
-        data-value="{{item.value}}"
-      >
-        {{item.label}}
-      </view>
-    </view>
-
-    <view class="action-row">
-      <ant-button type="primary" loading="{{loading}}" bindtap="startQuiz">开始答题</ant-button>
-    </view>
-  </ant-card>
+  </view>
 </view>

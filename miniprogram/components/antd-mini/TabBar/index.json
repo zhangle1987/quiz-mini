@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "styleIsolation": "shared",
-  "usingComponents": {
-    "ant-badge": "../Badge/index",
-    "image-icon": "../ImageIcon/index"
-  }
-}

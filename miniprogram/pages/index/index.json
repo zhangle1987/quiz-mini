@@ -1,8 +1,4 @@
 {
   "navigationBarTitleText": "开始刷题",
-  "enableShareAppMessage": true,
-  "usingComponents": {
-    "ant-card": "/components/antd-mini/Card/index",
-    "ant-button": "/components/antd-mini/Button/index"
-  }
+  "enableShareAppMessage": true
 }

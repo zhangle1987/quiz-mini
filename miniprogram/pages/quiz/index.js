@@ -1,9 +1,5 @@
 import { request } from "../../utils/request";
 
-function normalizeRadioValue(event) {
-  return event?.detail ?? event;
-}
-
 Page({
   clearAutoNextTimer() {
     if (this.autoNextTimer) {
@@ -37,7 +33,7 @@ Page({
       ...question,
       radioOptions: question.options.map((option) => ({
         value: option.key,
-        label: `${option.key}. ${option.text}`,
+        text: option.text,
       })),
     }));
   },
@@ -88,9 +84,12 @@ Page({
     }
   },
 
-  onOptionChange(event) {
+  onOptionTap(event) {
+    this.selectAnswer(event.currentTarget.dataset.value);
+  },
+
+  selectAnswer(answer) {
     const currentQuestion = this.data.questions[this.data.currentIndex];
-    const answer = normalizeRadioValue(event);
     const answers = {
       ...this.data.answers,
       [currentQuestion.id]: answer,

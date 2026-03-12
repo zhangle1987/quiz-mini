@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "styleIsolation": "shared",
-  "usingComponents": {
-    "ant-button": "../Button/index"
-  }
-}

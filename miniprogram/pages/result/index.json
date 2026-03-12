@@ -1,10 +1,4 @@
 {
   "navigationBarTitleText": "答题结果",
-  "enableShareAppMessage": true,
-  "usingComponents": {
-    "ant-card": "/components/antd-mini/Card/index",
-    "ant-button": "/components/antd-mini/Button/index",
-    "ant-tag": "/components/antd-mini/Tag/index",
-    "ant-list": "/components/antd-mini/List/index"
-  }
+  "enableShareAppMessage": true
 }

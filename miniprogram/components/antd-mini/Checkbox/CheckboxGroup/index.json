@@ -1,9 +1,0 @@
-{
-  "component": true,
-  "styleIsolation": "shared",
-  "usingComponents": {
-    "list": "../../List/index",
-    "list-item": "../../List/ListItem/index",
-    "ant-checkbox": "../index"
-  }
-}

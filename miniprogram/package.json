@@ -9,8 +9,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "antd-mini": "^3.4.3"
-  }
+  "type": "commonjs"
 }
