@@ -1,0 +1,9 @@
+{
+  "component": true,
+  "styleIsolation": "shared",
+  "usingComponents": {
+    "ant-mask": "../Mask/index",
+    "ant-icon": "../Icon/index",
+    "popover": "../Popover/index"
+  }
+}

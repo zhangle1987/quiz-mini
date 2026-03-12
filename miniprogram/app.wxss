@@ -1,0 +1,73 @@
+/**app.wxss**/
+:root {
+  --ant-primary: #1677ff;
+  --ant-primary-hover: #4096ff;
+  --ant-text: #262626;
+  --ant-text-secondary: #595959;
+  --ant-text-tertiary: #8c8c8c;
+  --ant-border: #d9d9d9;
+  --ant-border-light: #f0f0f0;
+  --ant-bg: #f5f7fa;
+  --ant-bg-elevated: #ffffff;
+  --ant-bg-soft: #fafafa;
+  --ant-success-bg: #f6ffed;
+  --ant-success-text: #52c41a;
+  --ant-error-bg: #fff2f0;
+  --ant-error-text: #ff4d4f;
+  --ant-shadow: 0 10rpx 28rpx rgba(5, 26, 62, 0.06);
+  --ant-radius-lg: 24rpx;
+  --ant-radius-md: 16rpx;
+  --button-color: #595959;
+  --button-background-color: #ffffff;
+  --button-border-color: #d9d9d9;
+  --button-primary-color: #ffffff;
+  --button-primary-background-color: #1677ff;
+  --button-primary-border-color: #1677ff;
+  --button-default-aide-color: #595959;
+  --button-default-aide-background-color: #ffffff;
+  --button-default-aide-border-color: #d9d9d9;
+  --radio-text-color: #262626;
+  --radio-border-color: #d9d9d9;
+  --radio-background-color: #1677ff;
+  --radio-disabled-background: #f5f5f5;
+  --ant-card-bg: #ffffff;
+  --ant-card-header-title-color: #262626;
+  --ant-card-divider-color: #f0f0f0;
+  --list-header-color: #8c8c8c;
+  --list-background-color: #ffffff;
+  --list-content-color: #262626;
+  --list-extra-brief-color: #8c8c8c;
+  --list-item-text-color: #d9d9d9;
+  --list-item-border-color: #f0f0f0;
+  --tag-primary-color: #1677ff;
+  --tag-primary-light-color: #e6f4ff;
+  --tag-primary-color-faded: rgba(22, 119, 255, 0.2);
+  --tag-warning-color: #faad14;
+  --tag-warning-light-color: #fffbe6;
+  --tag-warning-color-faded: rgba(250, 173, 20, 0.2);
+  --tag-success-color: #52c41a;
+  --tag-success-light-color: #f6ffed;
+  --tag-success-color-faded: rgba(82, 196, 26, 0.2);
+  --tag-danger-color: #ff4d4f;
+  --tag-danger-light-color: #fff2f0;
+  --tag-danger-color-faded: rgba(255, 77, 79, 0.2);
+  --progress-trail-color: #f0f0f0;
+  --progress-stroke-color: #1677ff;
+  --progress-success-color: #52c41a;
+  --progress-exception-color: #ff4d4f;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+page {
+  background: var(--ant-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: var(--ant-text);
+}

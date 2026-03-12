@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "styleIsolation": "shared",
+  "usingComponents": {
+    "ant-sticky": "../Sticky/index",
+    "ant-icon": "../Icon/index"
+  }
+}

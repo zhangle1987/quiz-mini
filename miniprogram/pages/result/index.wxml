@@ -1,0 +1,67 @@
+<view class="page" wx:if="{{result}}">
+  <ant-card title="答题结果">
+    <view class="paper-title">{{result.paper.title}}</view>
+    <view class="score">{{result.summary.score}}</view>
+    <view class="score-label">总分</view>
+
+    <view class="summary-grid">
+      <view class="summary-item">
+        <view class="summary-item__label">总题数</view>
+        <view class="summary-item__value">{{result.summary.total}}</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-item__label">答对</view>
+        <view class="summary-item__value">{{result.summary.correctCount}}</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-item__label">答错</view>
+        <view class="summary-item__value">{{result.summary.wrongCount}}</view>
+      </view>
+    </view>
+  </ant-card>
+
+  <view class="card-gap"></view>
+
+  <ant-card title="加微信好友" wx:if="{{broker}}">
+    <view class="broker-card">
+      <view class="broker-title">{{broker.name || broker.brokerId}}</view>
+      <view class="broker-desc">
+        答题结束后可直接添加微信沟通，二维码由后台维护。
+      </view>
+      <image
+        wx:if="{{broker.qrImageUrl}}"
+        class="broker-qr"
+        src="{{broker.qrImageUrl}}"
+        mode="aspectFit"
+        bindtap="previewBrokerQr"
+      />
+      <view class="broker-empty" wx:else>后台暂未上传二维码图片</view>
+    </view>
+  </ant-card>
+
+  <view class="card-gap"></view>
+
+  <ant-list header="逐题结果" radius="{{true}}">
+    <block wx:for="{{result.results}}" wx:key="questionId">
+      <view class="result-block">
+        <view class="result-head">
+          <view class="result-number">题目 {{item.number}}</view>
+          <ant-tag color="{{item.isCorrect ? 'success' : 'danger'}}" type="fill-light">
+            {{item.isCorrect ? '正确' : '错误'}}
+          </ant-tag>
+        </view>
+        <view class="result-stem">{{item.stem}}</view>
+        <view class="result-row">你的答案：{{item.userAnswer}}</view>
+        <view class="result-row">正确答案：{{item.correctAnswer}}</view>
+        <view class="result-explanation">
+          <view class="result-explanation__title">解析</view>
+          <view>{{item.explanation}}</view>
+        </view>
+      </view>
+    </block>
+  </ant-list>
+
+  <view class="footer-bar">
+    <ant-button type="primary" bindtap="backHome">返回首页</ant-button>
+  </view>
+</view>

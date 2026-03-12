@@ -1,0 +1,18 @@
+export var FormItemDefaultProps = {
+    name: null,
+    label: null,
+    labelWidth: null,
+    position: 'horizontal',
+    validateStatus: null,
+    help: null,
+    requiredMark: 'asterisk',
+    status: null,
+    errors: null,
+    tooltip: '',
+    required: false,
+    disabled: false,
+    readonly: false,
+    extra: '',
+    message: null,
+    dependencies: null,
+};

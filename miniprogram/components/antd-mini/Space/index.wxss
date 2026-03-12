@@ -1,0 +1,39 @@
+.ant-space {
+  display: inline-flex;
+}
+.ant-space-horizontal {
+  flex-direction: row;
+}
+.ant-space-vertical {
+  flex-direction: column;
+}
+.ant-space-wrap {
+  flex-wrap: wrap;
+}
+.ant-space-align-start {
+  align-items: flex-start;
+}
+.ant-space-align-end {
+  align-items: flex-end;
+}
+.ant-space-align-center {
+  align-items: center;
+}
+.ant-space-align-baseline {
+  align-items: baseline;
+}
+.ant-space-justify-start {
+  justify-content: flex-start;
+}
+.ant-space-justify-end {
+  justify-content: flex-end;
+}
+.ant-space-justify-center {
+  justify-content: center;
+}
+.ant-space-justify-space-around {
+  justify-content: space-around;
+}
+.ant-space-justify-space-between {
+  justify-content: space-between;
+}

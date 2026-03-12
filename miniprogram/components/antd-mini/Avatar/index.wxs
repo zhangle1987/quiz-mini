@@ -1,0 +1,12 @@
+function getClass(size) {
+  var list = ['x-small', 'small', 'medium', 'large'];
+  if (list.indexOf(size) >= 0) {
+    return "ant-avatar-image-".concat(size);
+  }
+  return 'ant-avatar-image-medium';
+}
+var defaultSrc = 'https://mdn.alipayobjects.com/huamei_2jrq4g/afts/img/A*qIuWQLqszlsAAAAAQFAAAAgAetF8AQ/original';
+module.exports = {
+  getClass: getClass,
+  defaultSrc: defaultSrc
+};

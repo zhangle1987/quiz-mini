@@ -1,0 +1,89 @@
+<form-item
+  className="{{className}}"
+  style="{{style}}"
+  position="{{position}}"
+  label="{{label}}"
+  labelWidth="{{labelWidth}}"
+  status="{{formData.status}}"
+  errors="{{formData.errors}}"
+  tooltip="{{tooltip}}"
+  required="{{formData.required}}"
+  requiredMark="{{requiredMark}}"
+  validateStatus="{{validateStatus}}"
+  help="{{help}}"
+>
+  <view wx:if="{{readonly}}">
+    <text wx:if="{{formData.value}}">{{formData.value}}</text>
+    <text wx:else>-</text>
+  </view>
+  <ant-input
+    style="{{readonly ? 'display:none' : ''}};{{inputStyle}}"
+    bindref="handleRef"
+    allowClear="{{allowClear}}"
+    enableNative="{{enableNative}}"
+    className="{{inputClassName}}"
+    disabled="{{disabled}}"
+    type="{{type}}"
+    password="{{password}}"
+    placeholder="{{placeholder}}"
+    alwaysSystem="{{alwaysSystem}}"
+    placeholderClassName="{{placeholderClassName}}"
+    placeholderStyle="{{placeholderStyle}}"
+    maxLength="{{maxLength}}"
+    confirmType="{{confirmType}}"
+    confirmHold="{{confirmHold}}"
+    cursor="{{cursor}}"
+    selectionStart="{{selectionStart}}"
+    selectionEnd="{{selectionEnd}}"
+    randomNumber="{{randomNumber}}"
+    max="{{max}}"
+    min="{{min}}"
+    precision="{{precision}}"
+    bindchange="onChange"
+    bindblur="onBlur"
+    bindfocus="onFocus"
+    bindconfirm="onConfirm"
+  >
+    <slot
+      name="prefix"
+      slot="prefix"
+    ></slot>
+    <slot
+      name="suffix"
+      slot="suffix"
+    ></slot>
+  </ant-input>
+  <view
+    wx:if="{{!tooltip}}"
+    slot="tooltip"
+  >
+    <slot name="tooltip"></slot>
+  </view>
+  <view slot="extra">
+    <block wx:if="{{extra}}">{{extra}}</block>
+    <slot
+      name="extra"
+      wx:else
+    ></slot>
+  </view>
+  <view
+    slot="header"
+    slot-scope="item"
+  >
+    <slot
+      name="header"
+      errors="{{item.errors}}"
+      status="{{item.status}}"
+    ></slot>
+  </view>
+  <view
+    slot="footer"
+    slot-scope="item"
+  >
+    <slot
+      name="footer"
+      errors="{{item.errors}}"
+      status="{{item.status}}"
+    ></slot>
+  </view>
+</form-item>

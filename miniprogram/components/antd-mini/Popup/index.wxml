@@ -1,0 +1,55 @@
+<wxs
+  src="./index.wxs"
+  module="utils"
+></wxs>
+<view
+  wx:if="{{!destroyOnClose || visible || closing}}"
+  class="ant-popup {{className || ''}}"
+  style="{{zIndex ? 'z-index:' + zIndex : ''}};{{style || ''}}"
+  hidden="{{!destroyOnClose && !visible && !closing}}"
+>
+  <view
+    wx:if="{{showMask}}"
+    class="ant-popup-mask {{maskClassName || ''}} {{position}} {{closing && !visible ? 'ant-popup-mask-closing' : ''}}"
+    bindtap="onTapMask"
+    style="{{utils.getCloseStyle(animation, duration, maskStyle)}}"
+  >
+    <slot name="mask"></slot>
+  </view>
+  <view
+    class="ant-popup-content ant-popup-{{animationType}}-{{position}} {{closing ? 'ant-popup-' + animationType + '-' + position + '-close' : ''}}"
+    style="{{utils.getContentStyle(position, animation, duration, width, height)}}"
+    bindanimationend="onAnimationEnd"
+  >
+    <view
+      wx:if="{{backgroundImage}}"
+      class="ant-popup-content-bg"
+      style="background-image: url({{backgroundImage}});"
+    ></view>
+    <view
+      wx:if="{{title || showClose || showBack}}"
+      class="ant-popup-content-header"
+    >
+      <view
+        wx:if="{{showBack}}"
+        class="ant-popup-content-header-icon ant-popup-content-header-icon-back"
+        bindtap="onClickBack"
+      >
+        <ant-icon type="LeftOutline"></ant-icon>
+      </view>
+      <view class="ant-popup-content-header-title">{{title}}</view>
+      <view
+        wx:if="{{showClose}}"
+        class="ant-popup-content-header-icon ant-popup-content-header-icon-close"
+        bindtap="onClickCloseIcon"
+      >
+        <ant-icon type="CloseOutline"></ant-icon>
+      </view>
+    </view>
+    <slot></slot>
+    <slot
+      name="content"
+      wx:if="{{isOldVersion}}"
+    ></slot>
+  </view>
+</view>

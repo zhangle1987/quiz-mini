@@ -1,0 +1,25 @@
+<view
+  class="ant-copilot-bubble {{'ant-copilot-bubble-' + placement}} {{className}}"
+  style="{{style}}"
+>
+  <image
+    wx:if="{{avatar}}"
+    class="ant-copilot-bubble-avatar"
+    src="{{avatar}}"
+  ></image>
+  <view class="ant-copilot-bubble-container">
+    <slot name="header"></slot>
+    <view class="ant-copilot-bubble-content {{shape}} {{variant}}">
+      <slot name="content-header"></slot>
+      <ant-loading
+        wx:if="{{loading}}"
+        type="mini"
+        color="#8C8C8C"
+      ></ant-loading>
+      <text wx:if="{{!loading && bubbleText}}">{{bubbleText}}</text>
+      <slot wx:if="{{!loading}}"></slot>
+      <slot name="content-footer"></slot>
+    </view>
+    <slot name="footer"></slot>
+  </view>
+</view>

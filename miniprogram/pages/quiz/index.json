@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "答题中",
+  "enableShareAppMessage": true,
+  "usingComponents": {
+    "ant-card": "/components/antd-mini/Card/index",
+    "ant-button": "/components/antd-mini/Button/index",
+    "ant-progress": "/components/antd-mini/Progress/index",
+    "ant-tag": "/components/antd-mini/Tag/index",
+    "ant-radio-group": "/components/antd-mini/Radio/RadioGroup/index"
+  }
+}

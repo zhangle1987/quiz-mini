@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "styleIsolation": "shared",
+  "usingComponents": {
+    "ant-checklist-item": "./ChecklistItem/index",
+    "ant-icon": "../Icon/index"
+  }
+}

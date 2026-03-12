@@ -1,0 +1,10 @@
+{
+  "component": true,
+  "styleIsolation": "shared",
+  "usingComponents": {
+    "ant-mask": "../Mask/index",
+    "ant-button": "../Button/index",
+    "ant-icon": "../Icon/index",
+    "ant-auto-resize": "../AutoResize/index"
+  }
+}

@@ -1,0 +1,60 @@
+<view class="page" wx:if="{{!loading && questions.length}}">
+  <ant-card title="{{paper.title}}">
+    <view class="meta-row">
+      <ant-tag type="fill-light">第 {{currentIndex + 1}} / {{questions.length}} 题</ant-tag>
+      <ant-tag type="fill-light" color="primary">已答 {{answeredCount}} 题</ant-tag>
+    </view>
+    <view class="progress-wrap">
+      <ant-progress percent="{{progressPercent}}" strokeWidth="{{8}}" />
+    </view>
+  </ant-card>
+
+  <view class="card-gap"></view>
+
+  <ant-card>
+    <view class="question-head">
+      <view class="question-number">题目 {{questions[currentIndex].number}}</view>
+      <ant-tag type="fill-light">章节 {{questions[currentIndex].reference}}</ant-tag>
+    </view>
+    <view class="question-stem">{{questions[currentIndex].stem}}</view>
+    <view class="radio-wrap">
+      <ant-radio-group
+        activeClassName="q-ant-radio-group-active"
+        options="{{questions[currentIndex].radioOptions}}"
+        value="{{answers[questions[currentIndex].id]}}"
+        position="vertical"
+        bindchange="onOptionChange"
+      />
+    </view>
+  </ant-card>
+
+  <view class="footer-bar">
+    <view class="action-row">
+      <ant-button
+        type="default"
+        size="small"
+        inline="{{true}}"
+        style="width: 260rpx; min-width: 132rpx; height: 68rpx; padding: 0 20rpx;"
+        className="quiz-nav-button"
+        activeClassName="quiz-nav-button-active"
+        bindtap="prevQuestion"
+        disabled="{{currentIndex === 0}}"
+      >上一题</ant-button>
+      <ant-button
+        type="default"
+        size="small"
+        inline="{{true}}"
+        style="width: 260rpx; min-width: 132rpx; height: 68rpx; padding: 0 20rpx;"
+        className="quiz-nav-button"
+        activeClassName="quiz-nav-button-active"
+        bindtap="nextQuestion"
+        disabled="{{currentIndex === questions.length - 1 || !currentQuestionAnswered}}"
+      >下一题</ant-button>
+    </view>
+    <view class="submit-row" style="margin-top:60rpx">
+      <ant-button type="primary" loading="{{submitting}}" bindtap="submitQuiz">提交答卷</ant-button>
+    </view>
+  </view>
+</view>
+
+<view class="loading" wx:else>正在加载题目...</view>
