@@ -1,15 +1,15 @@
 <view class="page">
   <view class="page-header">
-    <view class="page-header__eyebrow">题库刷题</view>
-    <view class="page-header__title">先选试卷，再开始练习</view>
+    <view class="page-header__eyebrow">題庫刷題</view>
+    <view class="page-header__title">先選擇試卷，再開始練習</view>
     <view class="page-header__desc">
-      选择题库后开始限时答题，系统会按后台配置随机抽题，到时自动交卷。
+      選擇題庫後即可開始限時作答，系統會依後台設定隨機抽題，時間到會自動交卷。
     </view>
   </view>
 
   <view class="ui-card">
     <view class="ui-card__body">
-      <view class="section-label">选择题库</view>
+      <view class="section-label">選擇題庫（每月更新最新真題）</view>
       <view class="paper-list">
         <view
           wx:for="{{papers}}"
@@ -19,34 +19,39 @@
           data-id="{{item.id}}"
         >
           <view class="paper-item__title">{{item.title}}</view>
-          <view class="paper-item__meta">题库共 {{item.questionCount}} 题</view>
+          <!-- <view class="paper-item__meta">题库共 {{item.questionCount}} 题</view> -->
           <view class="paper-item__meta">
-            抽取 {{item.quizConfig.questionCount}} 题 · {{item.quizConfig.durationMinutes}} 分钟 · {{item.quizConfig.passThreshold}}% 合格
+            抽取 {{item.quizConfig.questionCount}} 題 · {{item.quizConfig.durationMinutes}} 分鐘 · {{item.quizConfig.passThreshold}}% 合格
           </view>
         </view>
       </view>
 
-      <view class="section-label section-label--gap" wx:if="{{selectedPaper}}">考试配置</view>
+      <view class="section-label section-label--gap" wx:if="{{selectedPaper}}">考試設定</view>
       <view class="paper-config-grid" wx:if="{{selectedPaper}}">
         <view
           class="paper-config-card"
           bindtap="tapQuestionCountConfig"
         >
-          <view class="paper-config-card__label">抽题数量</view>
+          <view class="paper-config-card__label">抽題數量</view>
           <view class="paper-config-card__value">{{selectedPaper.quizConfig.questionCount}}</view>
         </view>
         <view class="paper-config-card">
-          <view class="paper-config-card__label">答题时长</view>
-          <view class="paper-config-card__value">{{selectedPaper.quizConfig.durationMinutes}} 分钟</view>
+          <view class="paper-config-card__label">作答時長</view>
+          <view class="paper-config-card__value">{{selectedPaper.quizConfig.durationMinutes}} 分鐘</view>
         </view>
         <view class="paper-config-card paper-config-card--wide">
-          <view class="paper-config-card__label">合格线</view>
+          <view class="paper-config-card__label">合格線</view>
           <view class="paper-config-card__value">{{selectedPaper.quizConfig.passThreshold}}%</view>
         </view>
       </view>
 
       <view class="action-row">
-        <button class="ui-button ui-button--primary" loading="{{loading}}" bindtap="startQuiz">开始答题</button>
+        <button class="ui-button ui-button--primary" loading="{{loading}}" bindtap="startQuiz">開始作答</button>
+        <button
+          wx:if="{{latestUnlockedAttempt}}"
+          class="ui-button ui-button--default"
+          bindtap="openLatestAttempt"
+        >查看上次作答結果</button>
       </view>
     </view>
   </view>

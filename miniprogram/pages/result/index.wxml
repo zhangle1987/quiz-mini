@@ -1,55 +1,76 @@
-<view class="page" wx:if="{{result}}">
-  <view class="ui-card">
-    <view class="ui-card__head">
-      <view class="ui-card__title">答题结果</view>
-    </view>
-    <view class="ui-card__body">
-      <view class="result-overview">
-        <view class="paper-title">{{result.paper.title}}</view>
-        <view class="exam-meta">
-          抽取 {{result.paper.quizConfig.questionCount}} 题 · 限时 {{result.paper.quizConfig.durationMinutes}} 分钟 · 合格线 {{result.summary.passThreshold}}%
-        </view>
-        <view class="score-panel">
-          <view class="score-panel__caption">本次正确率</view>
-          <view class="score">{{result.summary.accuracy}}<text class="score-unit">%</text></view>
-          <view class="score-status {{result.summary.passed ? 'score-status--passed' : 'score-status--failed'}}">
-            {{result.summary.passed ? '合格' : '不合格'}}
+<view class="page" wx:if="{{!loading && attempt}}">
+  <block wx:if="{{canViewAnswers}}">
+    <view class="ui-card">
+      <view class="ui-card__head">
+        <view class="ui-card__title">作答結果</view>
+      </view>
+      <view class="ui-card__body">
+        <view class="result-overview">
+          <view class="paper-title">{{attempt.paper.title}}</view>
+          <view class="exam-meta">
+            抽取 {{attempt.paper.quizConfig.questionCount}} 題 · 限時 {{attempt.paper.quizConfig.durationMinutes}} 分鐘 · 合格線 {{attempt.summary.passThreshold}}%
           </view>
-          <view class="score-label" wx:if="{{result.summary.autoSubmitted}}">答题时间结束，系统已自动交卷</view>
-        </view>
+          <view class="score-panel">
+            <view class="score-panel__caption">本次正確率</view>
+            <view class="score">{{attempt.summary.accuracy}}<text class="score-unit">%</text></view>
+            <view class="score-status {{attempt.summary.passed ? 'score-status--passed' : 'score-status--failed'}}">
+              {{attempt.summary.passed ? '合格' : '不合格'}}
+            </view>
+            <view class="score-label" wx:if="{{attempt.summary.autoSubmitted}}">作答時間已結束，系統已自動交卷</view>
+          </view>
 
-        <view class="summary-grid">
-          <view class="summary-item">
-            <view class="summary-item__label">总题数</view>
-            <view class="summary-item__value">{{result.summary.total}}</view>
-          </view>
-          <view class="summary-item">
-            <view class="summary-item__label">已作答</view>
-            <view class="summary-item__value">{{result.summary.answeredCount}}</view>
-          </view>
-          <view class="summary-item">
-            <view class="summary-item__label">答对</view>
-            <view class="summary-item__value">{{result.summary.correctCount}}</view>
-          </view>
-          <view class="summary-item">
-            <view class="summary-item__label">未作答</view>
-            <view class="summary-item__value">{{result.summary.unansweredCount}}</view>
+          <view class="summary-grid">
+            <view class="summary-item">
+              <view class="summary-item__label">總題數</view>
+              <view class="summary-item__value">{{attempt.summary.total}}</view>
+            </view>
+            <view class="summary-item">
+              <view class="summary-item__label">已作答</view>
+              <view class="summary-item__value">{{attempt.summary.answeredCount}}</view>
+            </view>
+            <view class="summary-item">
+              <view class="summary-item__label">答對</view>
+              <view class="summary-item__value">{{attempt.summary.correctCount}}</view>
+            </view>
+            <view class="summary-item">
+              <view class="summary-item__label">未作答</view>
+              <view class="summary-item__value">{{attempt.summary.unansweredCount}}</view>
+            </view>
           </view>
         </view>
       </view>
     </view>
-  </view>
 
-  <view class="card-gap"></view>
+    <view class="card-gap"></view>
+  </block>
 
-  <view class="ui-card" wx:if="{{broker}}">
+  <block wx:else>
+    <view class="ui-card">
+      <view class="ui-card__body">
+        <view class="pending-panel">
+          <view class="pending-panel__tag">待解鎖</view>
+          <view class="pending-panel__title">加入助考官好友後可查看答案</view>
+          <view class="pending-panel__desc">
+            你的作答記錄已經儲存。請先加入下方助考官好友，待後台確認後，再次進入小程式即可直接查看答案與解析。
+          </view>
+          <view class="pending-panel__meta">
+            <view>試卷：{{attempt.paper.title}}</view>
+            <view>提交時間：{{attempt.createdAt}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card-gap"></view>
+  </block>
+
+  <view class="ui-card" wx:if="{{broker && !canViewAnswers}}">
     <view class="ui-card__body">
       <view class="broker-card broker-card--framed">
-        <!-- <view class="broker-title">{{broker.name || broker.brokerId}}</view>
+        <view class="broker-title">{{broker.name}}</view>
         <view class="broker-desc">
-          答题结束后可直接添加微信沟通，二维码由后台维护。
-        </view> -->
-        <view class="broker-desc">长按添加微信好友咨询</view>
+          請先加入主考官微信好友，待後台確認後即可查看答案
+        </view>
         <image
           class="broker-qr"
           src="{{broker.qrImageUrl}}"
@@ -61,47 +82,51 @@
     </view>
   </view>
 
-  <view class="card-gap"></view>
-
-  <view class="ui-card">
+  <view class="ui-card" wx:if="{{canViewAnswers}}">
     <view class="ui-card__head">
-      <view class="ui-card__title">逐题结果</view>
+      <view class="ui-card__title">逐題結果</view>
     </view>
     <view class="ui-card__body">
       <view class="result-list">
-      <block wx:for="{{result.results}}" wx:key="questionId">
-        <view class="result-block">
-          <view class="result-head">
-            <view class="result-head__main">
-              <view class="result-number">题目 {{item.number}}</view>
-              <view class="result-reference" wx:if="{{item.reference}}">{{item.reference}}</view>
+        <block wx:for="{{attempt.results}}" wx:key="questionId">
+          <view class="result-block">
+            <view class="result-head">
+              <view class="result-head__main">
+                <view class="result-number">題目 {{item.number}}</view>
+                <view class="result-reference" wx:if="{{item.reference}}">{{item.reference}}</view>
+              </view>
+              <view class="result-state {{item.statusClass}}">
+                {{item.statusLabel}}
+              </view>
             </view>
-            <view class="result-state {{item.statusClass}}">
-              {{item.statusLabel}}
+            <view class="result-stem">{{item.stem}}</view>
+            <view class="result-answer-grid">
+              <view class="result-answer-card">
+                <view class="result-answer-card__label">你的答案</view>
+                <view class="result-answer-card__value">{{item.userAnswerLabel}}</view>
+              </view>
+              <view class="result-answer-card">
+                <view class="result-answer-card__label">正確答案</view>
+                <view class="result-answer-card__value">{{item.correctAnswer}}</view>
+              </view>
+            </view>
+            <view class="result-explanation">
+              <view class="result-explanation__title">解析</view>
+              <view>{{item.explanation}}</view>
             </view>
           </view>
-          <view class="result-stem">{{item.stem}}</view>
-          <view class="result-answer-grid">
-            <view class="result-answer-card">
-              <view class="result-answer-card__label">你的答案</view>
-              <view class="result-answer-card__value">{{item.userAnswerLabel}}</view>
-            </view>
-            <view class="result-answer-card">
-              <view class="result-answer-card__label">正确答案</view>
-              <view class="result-answer-card__value">{{item.correctAnswer}}</view>
-            </view>
-          </view>
-          <view class="result-explanation">
-            <view class="result-explanation__title">解析</view>
-            <view>{{item.explanation}}</view>
-          </view>
-        </view>
-      </block>
+        </block>
       </view>
     </view>
   </view>
 
   <view class="footer-bar">
-    <button class="ui-button ui-button--primary" bindtap="backHome">返回首页</button>
+    <view class="footer-bar__actions">
+      <button class="ui-button ui-button--default" bindtap="backHome">返回首頁</button>
+      <button class="ui-button ui-button--primary" bindtap="restartQuiz">再次作答</button>
+    </view>
   </view>
 </view>
+
+<view class="loading" wx:elif="{{loading}}">正在載入結果...</view>
+<view class="loading" wx:else>暫無作答記錄</view>

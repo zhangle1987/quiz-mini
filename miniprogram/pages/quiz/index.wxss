@@ -255,3 +255,78 @@ page {
   text-align: center;
   color: var(--ant-text-tertiary);
 }
+
+.submit-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  background: rgba(15, 23, 42, 0.32);
+}
+
+.submit-dialog {
+  width: 100%;
+  max-width: 640rpx;
+  padding: 32rpx 28rpx 28rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 24rpx 56rpx rgba(15, 23, 42, 0.18);
+}
+
+.submit-dialog__title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--ant-text);
+}
+
+.submit-dialog__desc {
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: var(--ant-text-secondary);
+}
+
+.submit-dialog__field {
+  margin-top: 24rpx;
+}
+
+.submit-dialog__field-label {
+  font-size: 24rpx;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--ant-text);
+}
+
+.submit-dialog__input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 88rpx;
+  margin-top: 12rpx;
+  padding: 0 24rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid #d7e1ec;
+  background: #f8fafc;
+  font-size: 28rpx;
+  color: var(--ant-text);
+}
+
+.submit-dialog__hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--ant-text-tertiary);
+}
+
+.submit-dialog__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.submit-dialog__cancel {
+  color: #667085;
+}

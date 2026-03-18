@@ -4,20 +4,22 @@ const STORAGE_KEYS = {
   shareBrokerId: "shareBrokerId",
   sourceBrokerId: "sourceBrokerId",
   latestUser: "latestUser",
+  latestQuizAttempt: "latestQuizAttempt",
+  activeQuizSession: "activeQuizSession",
+  latestAttemptViewState: "latestAttemptViewState",
 };
 
 App({
   onLaunch(options) {
-    const apiBaseUrl = "https://test-quiz-server.romtok.com/api";
-    // const apiBaseUrl = "http://127.0.0.1:3000/api";
+    const apiBaseUrl = "https://iiqe.orangator.com/api";
+    // const apiBaseUrl = "http://10.0.0.247:3000/api";
     this.globalData = {
       apiBaseUrl,
       serverOrigin: apiBaseUrl.replace(/\/api\/?$/, ""),
-      appName: "保险刷题",
+      appName: "保險刷題",
       user: null,
       loginAvailable: false,
       loginWarning: "",
-      currentBroker: null,
       sourceBroker: null,
       defaultBroker: null,
       effectiveBroker: null,
@@ -25,17 +27,18 @@ App({
       shareBrokerId: "",
       config: null,
       preloadedQuiz: null,
+      latestAttemptPreview: null,
+      latestAttemptDismissedId: "",
+      activeQuizSession: wx.getStorageSync(STORAGE_KEYS.activeQuizSession) || null,
+      activeQuizDismissedId: "",
     };
 
     this.bootstrapPromise = this.bootstrapSession(options);
   },
 
   onShow(options) {
-    const incomingBrokerId = this.getIncomingBrokerId(options);
-    if (!incomingBrokerId) {
-      return;
-    }
-
+    this.globalData.latestAttemptDismissedId = "";
+    this.globalData.activeQuizDismissedId = "";
     this.bootstrapPromise = this.bootstrapSession(options);
   },
 
@@ -43,23 +46,58 @@ App({
     return this.bootstrapPromise || Promise.resolve();
   },
 
-  getIncomingBrokerId(options = {}) {
-    return String(options?.query?.brokerId || "").trim();
+  getBrokerIdFromScene(sceneValue = "") {
+    const rawScene = String(sceneValue || "").trim();
+    if (!rawScene) {
+      return "";
+    }
+
+    let decodedScene = rawScene;
+    try {
+      decodedScene = decodeURIComponent(rawScene);
+    } catch {
+      decodedScene = rawScene;
+    }
+
+    if (decodedScene.startsWith("i=")) {
+      return decodedScene.slice(2).trim();
+    }
+    
+    return "";
+  },
+
+  getIncomingBrokerEntry(options = {}) {
+    const queryBrokerRef = String(options?.query?.broker || "").trim();
+    if (queryBrokerRef) {
+      return {
+        brokerId: queryBrokerRef,
+        sourceType: "query",
+      };
+    }
+
+    const sceneBrokerId = this.getBrokerIdFromScene(options?.query?.scene);
+    if (sceneBrokerId) {
+      return {
+        brokerId: sceneBrokerId,
+        sourceType: "scene",
+      };
+    }
+
+    return {
+      brokerId: "",
+      sourceType: "",
+    };
   },
 
   getStoredBrokerId() {
-    return String(
-      wx.getStorageSync(STORAGE_KEYS.sourceBrokerId)
-      || wx.getStorageSync(STORAGE_KEYS.shareBrokerId)
-      || "",
-    ).trim();
+    return String(wx.getStorageSync(STORAGE_KEYS.sourceBrokerId) || "").trim();
   },
 
   setStoredBrokerId(brokerId) {
     const normalizedBrokerId = String(brokerId || "").trim();
     if (normalizedBrokerId) {
       wx.setStorageSync(STORAGE_KEYS.sourceBrokerId, normalizedBrokerId);
-      wx.setStorageSync(STORAGE_KEYS.shareBrokerId, normalizedBrokerId);
+      wx.removeStorageSync(STORAGE_KEYS.shareBrokerId);
       return;
     }
 
@@ -68,28 +106,167 @@ App({
   },
 
   applyBrokerResolution(payload = {}, fallbackSourceBrokerId = "") {
-    this.globalData.currentBroker = payload.currentBroker || null;
     this.globalData.sourceBroker = payload.sourceBroker || null;
     this.globalData.defaultBroker = payload.defaultBroker || null;
     this.globalData.effectiveBroker = payload.effectiveBroker || null;
     this.globalData.config = payload.config || null;
 
     const sourceBrokerId = String(
-      payload.sourceBroker?.brokerId
-      || payload.defaultBroker?.brokerId
+      payload.sourceBroker?.id
       || fallbackSourceBrokerId
       || "",
     ).trim();
     const shareBrokerId = String(
-      payload.currentBroker?.brokerId
-      || sourceBrokerId
-      || payload.defaultBroker?.brokerId
+      sourceBrokerId
+      || payload.defaultBroker?.id
       || "",
     ).trim();
 
     this.globalData.sourceBrokerId = sourceBrokerId;
     this.globalData.shareBrokerId = shareBrokerId;
     this.setStoredBrokerId(sourceBrokerId);
+  },
+
+  setLatestAttemptPreview(preview) {
+    const normalizedPreview = preview && preview.id
+      ? {
+        ...preview,
+      }
+      : null;
+    const currentId = String(this.globalData.latestAttemptPreview?.id || "").trim();
+    const nextId = String(normalizedPreview?.id || "").trim();
+    if (currentId !== nextId) {
+      this.globalData.latestAttemptDismissedId = "";
+    }
+    this.globalData.latestAttemptPreview = normalizedPreview;
+  },
+
+  getLatestAttemptViewStateRecord() {
+    const record = wx.getStorageSync(STORAGE_KEYS.latestAttemptViewState) || null;
+    return record && typeof record === "object" ? record : null;
+  },
+
+  getLatestAttemptViewState(attemptId = "") {
+    const normalizedAttemptId = String(attemptId || "").trim();
+    if (!normalizedAttemptId) {
+      return "";
+    }
+
+    const record = this.getLatestAttemptViewStateRecord();
+    if (!record || String(record.id || "").trim() !== normalizedAttemptId) {
+      return "";
+    }
+
+    return String(record.state || "").trim();
+  },
+
+  setLatestAttemptViewState(attemptId = "", state = "") {
+    const normalizedAttemptId = String(attemptId || "").trim();
+    const normalizedState = String(state || "").trim();
+    if (!normalizedAttemptId || !normalizedState) {
+      wx.removeStorageSync(STORAGE_KEYS.latestAttemptViewState);
+      return;
+    }
+
+    wx.setStorageSync(STORAGE_KEYS.latestAttemptViewState, {
+      id: normalizedAttemptId,
+      state: normalizedState,
+    });
+  },
+
+  markLatestAttemptViewed(attempt) {
+    const attemptId = String(attempt?.id || "").trim();
+    if (!attemptId) {
+      return;
+    }
+
+    const state = attempt?.access?.canViewAnswers ? "unlocked" : "locked";
+    this.setLatestAttemptViewState(attemptId, state);
+  },
+
+  cacheLatestAttempt(attempt) {
+    if (!attempt?.id) {
+      wx.removeStorageSync(STORAGE_KEYS.latestQuizAttempt);
+      this.setLatestAttemptPreview(null);
+      this.setLatestAttemptViewState("", "");
+      return;
+    }
+
+    wx.setStorageSync(STORAGE_KEYS.latestQuizAttempt, attempt);
+    this.setLatestAttemptPreview({
+      id: attempt.id,
+      paper: attempt.paper || null,
+      access: attempt.access || null,
+      createdAt: attempt.createdAt || "",
+    });
+  },
+
+  getCachedLatestAttempt() {
+    return wx.getStorageSync(STORAGE_KEYS.latestQuizAttempt) || null;
+  },
+
+  consumeLatestAttemptForAutoOpen() {
+    const preview = this.globalData.latestAttemptPreview;
+    const previewId = String(preview?.id || "").trim();
+    if (!previewId || this.globalData.latestAttemptDismissedId === previewId) {
+      return null;
+    }
+
+    const canViewAnswers = Boolean(preview?.access?.canViewAnswers);
+    if (canViewAnswers && this.getLatestAttemptViewState(previewId) !== "locked") {
+      return null;
+    }
+
+    this.globalData.latestAttemptDismissedId = previewId;
+    return preview;
+  },
+
+  dismissLatestAttempt(attemptId = "") {
+    this.globalData.latestAttemptDismissedId = String(attemptId || "").trim();
+  },
+
+  setActiveQuizSession(session, options = {}) {
+    const { markHandled = false } = options;
+    if (!session?.id || !session?.paper?.id || !Array.isArray(session.questions) || !session.questions.length) {
+      wx.removeStorageSync(STORAGE_KEYS.activeQuizSession);
+      this.globalData.activeQuizSession = null;
+      this.globalData.activeQuizDismissedId = "";
+      return;
+    }
+
+    const normalizedSession = {
+      ...session,
+    };
+    this.globalData.activeQuizSession = normalizedSession;
+    wx.setStorageSync(STORAGE_KEYS.activeQuizSession, normalizedSession);
+    this.globalData.activeQuizDismissedId = markHandled ? normalizedSession.id : "";
+  },
+
+  getActiveQuizSession() {
+    if (this.globalData.activeQuizSession?.id) {
+      return this.globalData.activeQuizSession;
+    }
+
+    const storedSession = wx.getStorageSync(STORAGE_KEYS.activeQuizSession) || null;
+    this.globalData.activeQuizSession = storedSession?.id ? storedSession : null;
+    return this.globalData.activeQuizSession;
+  },
+
+  clearActiveQuizSession() {
+    wx.removeStorageSync(STORAGE_KEYS.activeQuizSession);
+    this.globalData.activeQuizSession = null;
+    this.globalData.activeQuizDismissedId = "";
+  },
+
+  consumeActiveQuizSessionForAutoOpen() {
+    const session = this.getActiveQuizSession();
+    const sessionId = String(session?.id || "").trim();
+    if (!sessionId || this.globalData.activeQuizDismissedId === sessionId) {
+      return null;
+    }
+
+    this.globalData.activeQuizDismissedId = sessionId;
+    return session;
   },
 
   async getLoginCode() {
@@ -102,7 +279,8 @@ App({
   },
 
   async bootstrapSession(options) {
-    const incomingBrokerId = this.getIncomingBrokerId(options);
+    const incomingBrokerEntry = this.getIncomingBrokerEntry(options);
+    const incomingBrokerId = incomingBrokerEntry.brokerId;
     const storedBrokerId = this.getStoredBrokerId();
     const code = await this.getLoginCode();
 
@@ -113,6 +291,7 @@ App({
         data: {
           code,
           incomingBrokerId,
+          incomingBrokerSource: incomingBrokerEntry.sourceType,
           storedBrokerId,
         },
       });
@@ -121,6 +300,7 @@ App({
       this.globalData.loginAvailable = Boolean(response.loginAvailable);
       this.globalData.loginWarning = response.loginWarning || "";
       this.applyBrokerResolution(response, storedBrokerId);
+      this.setLatestAttemptPreview(response.latestAttempt || null);
 
       if (response.user) {
         wx.setStorageSync(STORAGE_KEYS.latestUser, response.user);
@@ -128,16 +308,16 @@ App({
 
       return response;
     } catch (error) {
-      this.globalData.loginWarning = error?.message || "启动失败";
+      this.globalData.loginWarning = error?.message || "啟動失敗";
       this.globalData.loginAvailable = false;
       this.globalData.user = wx.getStorageSync(STORAGE_KEYS.latestUser) || null;
       this.applyBrokerResolution({
-        currentBroker: null,
-        sourceBroker: storedBrokerId ? { brokerId: storedBrokerId } : null,
+        sourceBroker: storedBrokerId ? { id: storedBrokerId } : null,
         defaultBroker: null,
-        effectiveBroker: storedBrokerId ? { brokerId: storedBrokerId } : null,
+        effectiveBroker: storedBrokerId ? { id: storedBrokerId } : null,
         config: this.globalData.config,
       }, storedBrokerId);
+      this.setLatestAttemptPreview(this.getCachedLatestAttempt());
       return null;
     }
   },
@@ -157,7 +337,7 @@ App({
       return {
         openid: "",
         loginAvailable: this.globalData.loginAvailable,
-        loginWarning: "未获取到登录 code",
+        loginWarning: "未取得登入代碼",
       };
     }
 
@@ -171,11 +351,12 @@ App({
       this.globalData.user = response.user || this.globalData.user || null;
       this.globalData.loginAvailable = Boolean(response.loginAvailable);
       this.globalData.loginWarning = response.loginWarning || "";
-      this.globalData.currentBroker = response.currentBroker || this.globalData.currentBroker || null;
+      if (response.user) {
+        wx.setStorageSync(STORAGE_KEYS.latestUser, response.user);
+      }
       this.globalData.shareBrokerId = String(
-        this.globalData.currentBroker?.brokerId
-        || this.globalData.sourceBrokerId
-        || this.globalData.defaultBroker?.brokerId
+        this.globalData.sourceBrokerId
+        || this.globalData.defaultBroker?.id
         || "",
       ).trim();
 
@@ -188,18 +369,17 @@ App({
       return {
         openid: "",
         loginAvailable: this.globalData.loginAvailable,
-        loginWarning: error?.message || "获取 OpenID 失败",
+        loginWarning: error?.message || "取得 OpenID 失敗",
       };
     }
   },
 
   getShareBrokerId() {
     return this.globalData.shareBrokerId
-      || this.globalData.currentBroker?.brokerId
       || this.globalData.sourceBrokerId
-      || this.globalData.sourceBroker?.brokerId
+      || this.globalData.sourceBroker?.id
       || this.getStoredBrokerId()
-      || this.globalData.defaultBroker?.brokerId
+      || this.globalData.defaultBroker?.id
       || "";
   },
 
@@ -234,7 +414,7 @@ App({
     const brokerId = this.getShareBrokerId();
     const separator = path.includes("?") ? "&" : "?";
     const sharePath = brokerId
-      ? `${path}${separator}brokerId=${encodeURIComponent(brokerId)}`
+      ? `${path}${separator}broker=${encodeURIComponent(brokerId)}`
       : path;
 
     return {

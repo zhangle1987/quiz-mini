@@ -18,6 +18,10 @@ Page({
   data: {
     loading: true,
     submitting: false,
+    submitPromptVisible: false,
+    submitPromptLocked: false,
+    submitPromptMessage: "",
+    submitNickname: "",
     paper: null,
     quizConfig: null,
     questions: [],
@@ -31,6 +35,12 @@ Page({
   },
 
   onLoad(options) {
+    const activeSession = this.getActiveSession(options.paperId);
+    if (activeSession) {
+      this.restoreQuizSession(activeSession);
+      return;
+    }
+
     const preloaded = getApp().takePreloadedQuiz(options.paperId);
     if (preloaded) {
       this.applyQuestionBankResponse(preloaded);
@@ -50,11 +60,37 @@ Page({
 
   onHide() {
     this.clearCountdownTimer();
+    if (!this.data.submitPromptLocked) {
+      this.setData({ submitPromptVisible: false });
+    }
+    this.persistQuizSession();
   },
 
   onUnload() {
     this.clearAutoNextTimer();
     this.clearCountdownTimer();
+    if (this.shouldPersistSession === false) {
+      return;
+    }
+
+    const activeSession = getApp().getActiveQuizSession();
+    if (activeSession?.id && activeSession.id === this.sessionId) {
+      getApp().clearActiveQuizSession();
+    }
+  },
+
+  getActiveSession(expectedPaperId = "") {
+    const session = getApp().getActiveQuizSession();
+    if (!session?.paper?.id) {
+      return null;
+    }
+
+    const normalizedExpectedPaperId = String(expectedPaperId || "").trim();
+    if (normalizedExpectedPaperId && String(session.paper.id || "").trim() !== normalizedExpectedPaperId) {
+      return null;
+    }
+
+    return session;
   },
 
   decorateQuestions(questions) {
@@ -79,6 +115,10 @@ Page({
       progressPercent,
       currentQuestionAnswered,
     });
+    this.persistQuizSession({
+      currentIndex: nextIndex,
+      answers: nextAnswers,
+    });
   },
 
   formatRemainingTime(totalSeconds = 0) {
@@ -95,6 +135,7 @@ Page({
       remainingSeconds: totalSeconds,
       timerText: this.formatRemainingTime(totalSeconds),
     });
+    this.persistQuizSession();
     this.startCountdownTick();
   },
 
@@ -114,7 +155,7 @@ Page({
       if (remainingSeconds <= 0) {
         this.clearCountdownTimer();
         if (!this.data.submitting) {
-          this.submitQuiz({ forced: true });
+          this.prepareSubmit({ forced: true });
         }
       }
     };
@@ -151,7 +192,88 @@ Page({
       remainingSeconds: Math.round((quizConfig.durationMinutes || 0) * 60),
       timerText: this.formatRemainingTime(Math.round((quizConfig.durationMinutes || 0) * 60)),
     });
+    this.shouldPersistSession = true;
+    this.sessionId = `quiz-${response.paper.id}-${Date.now()}`;
+    getApp().setActiveQuizSession({
+      id: this.sessionId,
+      paper: response.paper,
+      quizConfig,
+      questions,
+      answers: {},
+      currentIndex: 0,
+      deadlineAt: 0,
+    }, { markHandled: true });
     this.startCountdown(quizConfig.durationMinutes || 60);
+  },
+
+  restoreQuizSession(session) {
+    const questions = Array.isArray(session.questions) ? session.questions : [];
+    const quizConfig = session.quizConfig || {
+      durationMinutes: 60,
+      questionCount: questions.length,
+      passThreshold: 70,
+    };
+    const answers = session.answers && typeof session.answers === "object" ? session.answers : {};
+    const currentIndex = Math.max(
+      0,
+      Math.min(Number(session.currentIndex) || 0, Math.max(questions.length - 1, 0)),
+    );
+    this.sessionId = String(session.id || `quiz-${session.paper?.id || "paper"}-${Date.now()}`);
+    this.deadlineAt = Number(session.deadlineAt) || Date.now();
+    this.shouldPersistSession = true;
+
+    wx.setNavigationBarTitle({
+      title: session.paper?.title || "作答中",
+    });
+
+    this.setData({
+      loading: false,
+      paper: session.paper || null,
+      quizConfig,
+      questions,
+      currentIndex,
+      answers,
+      answeredCount: 0,
+      progressPercent: 0,
+      currentQuestionAnswered: false,
+      remainingSeconds: Math.max(0, Math.ceil((this.deadlineAt - Date.now()) / 1000)),
+      timerText: this.formatRemainingTime(Math.max(0, Math.ceil((this.deadlineAt - Date.now()) / 1000))),
+    });
+    getApp().setActiveQuizSession({
+      id: this.sessionId,
+      paper: session.paper || null,
+      quizConfig,
+      questions,
+      answers,
+      currentIndex,
+      deadlineAt: this.deadlineAt,
+    }, { markHandled: true });
+    this.updateProgress(currentIndex, answers);
+    this.startCountdownTick();
+  },
+
+  persistQuizSession(overrides = {}) {
+    if (this.shouldPersistSession === false) {
+      return;
+    }
+
+    const paper = overrides.paper || this.data.paper;
+    const questions = overrides.questions || this.data.questions;
+    if (!paper?.id || !Array.isArray(questions) || !questions.length) {
+      return;
+    }
+
+    getApp().setActiveQuizSession({
+      id: this.sessionId || `quiz-${paper.id}-${Date.now()}`,
+      paper,
+      quizConfig: overrides.quizConfig || this.data.quizConfig,
+      questions,
+      answers: overrides.answers || this.data.answers,
+      currentIndex: Number.isFinite(Number(overrides.currentIndex))
+        ? Number(overrides.currentIndex)
+        : this.data.currentIndex,
+      deadlineAt: Number(overrides.deadlineAt ?? this.deadlineAt) || 0,
+    }, { markHandled: true });
   },
 
   async loadQuestions(paperId) {
@@ -164,7 +286,7 @@ Page({
     } catch (error) {
       console.error(error);
       wx.showToast({
-        title: "题目加载失败",
+        title: "題目載入失敗",
         icon: "none",
       });
       this.setData({ loading: false });
@@ -193,6 +315,8 @@ Page({
         this.updateProgress(nextIndex, answers);
         this.autoNextTimer = null;
       }, 160);
+    } else {
+      this.persistQuizSession({ answers });
     }
   },
 
@@ -213,7 +337,7 @@ Page({
     }
     if (!this.data.currentQuestionAnswered) {
       wx.showToast({
-        title: "请先回答当前题目",
+        title: "請先回答目前題目",
         icon: "none",
       });
       return;
@@ -223,8 +347,106 @@ Page({
     this.updateProgress(nextIndex, this.data.answers);
   },
 
+  async prepareSubmit(options = {}) {
+    if (this.data.submitting) {
+      return;
+    }
+
+    const forced = Boolean(options.forced);
+
+    try {
+      const { openid, loginAvailable, loginWarning } = await getApp().getCurrentOpenId({
+        forceRefresh: true,
+      });
+      if (!openid) {
+        throw new Error(loginWarning || (loginAvailable ? "未取得 OpenID" : "服務端未開啟微信登入"));
+      }
+
+      const friendStatus = String(getApp().globalData.user?.friendStatus || "").trim().toLowerCase();
+      if (friendStatus === "added") {
+        await this.submitQuiz({ openid, nickname: "", forced });
+        return;
+      }
+    } catch (error) {
+      wx.showToast({
+        title: error?.message || "提交前檢查失敗",
+        icon: "none",
+      });
+      return;
+    }
+
+    this.openSubmitPrompt({ forced });
+  },
+
+  openSubmitPrompt(options = {}) {
+    if (this.data.submitting) {
+      return;
+    }
+
+    const forced = Boolean(options.forced);
+    const unansweredCount = this.data.questions.length - Object.keys(this.data.answers).length;
+    const submitPromptMessage = forced
+      ? "作答時間已結束，請先填寫暱稱，再提交答卷。"
+      : unansweredCount > 0
+      ? `還有 ${unansweredCount} 題未作答。請先填寫暱稱，再提交答卷。`
+      : "請先填寫暱稱，再提交答卷。";
+
+    this.setData({
+      submitPromptVisible: true,
+      submitPromptLocked: forced,
+      submitPromptMessage,
+      submitNickname: String(getApp().globalData.user?.nickname || "").trim(),
+    });
+  },
+
+  cancelSubmitPrompt() {
+    if (this.data.submitting || this.data.submitPromptLocked) {
+      return;
+    }
+
+    this.setData({
+      submitPromptVisible: false,
+      submitPromptLocked: false,
+      submitPromptMessage: "",
+      submitNickname: "",
+    });
+  },
+
+  onNicknameInput(event) {
+    this.setData({
+      submitNickname: String(event.detail?.value || ""),
+    });
+  },
+
+  async submitWithNickname(event) {
+    if (this.data.submitting) {
+      return;
+    }
+
+    const nickname = String(event?.detail?.value?.nickname || this.data.submitNickname || "").trim();
+    if (!nickname) {
+      wx.showToast({
+        title: "請先填寫暱稱",
+        icon: "none",
+      });
+      return;
+    }
+
+    const forced = Boolean(this.data.submitPromptLocked);
+    this.setData({
+      submitPromptVisible: false,
+      submitPromptLocked: false,
+      submitPromptMessage: "",
+      submitNickname: "",
+    });
+    await this.submitQuiz({ nickname, forced });
+  },
+
   async submitQuiz(options = {}) {
-    const { forced = false, confirmed = false } = options;
+    const {
+      forced = false,
+      openid: providedOpenId = "",
+    } = options;
     if (this.data.submitting) {
       return;
     }
@@ -234,24 +456,29 @@ Page({
       questionId,
       answer,
     }));
-    const unansweredCount = questionIds.length - answers.length;
-
-    if (!forced && unansweredCount > 0 && !confirmed) {
-      wx.showModal({
-        title: "确认提交",
-        content: `还有 ${unansweredCount} 题未作答，确定现在提交吗？`,
-        success: ({ confirm }) => {
-          if (confirm) {
-            this.submitQuiz({ confirmed: true });
-          }
-        },
-      });
-      return;
-    }
 
     this.clearCountdownTimer();
-    this.setData({ submitting: true });
+    this.setData({
+      submitting: true,
+      submitPromptVisible: false,
+      submitPromptLocked: false,
+      submitPromptMessage: "",
+      submitNickname: "",
+    });
     try {
+      let openid = String(providedOpenId || "").trim();
+      let loginAvailable = getApp().globalData.loginAvailable;
+      let loginWarning = getApp().globalData.loginWarning;
+      if (!openid) {
+        const loginState = await getApp().getCurrentOpenId();
+        openid = String(loginState.openid || "").trim();
+        loginAvailable = loginState.loginAvailable;
+        loginWarning = loginState.loginWarning;
+      }
+      if (!openid) {
+        throw new Error(loginWarning || (loginAvailable ? "未取得 OpenID" : "服務端未開啟微信登入"));
+      }
+
       const result = await request({
         url: "/quiz/grade",
         method: "POST",
@@ -259,18 +486,24 @@ Page({
           paperId: this.data.paper.id,
           questionIds,
           brokerId: getApp().getShareBrokerId(),
+          openid,
+          nickname: String(options.nickname || "").trim(),
           answers,
           submitMode: forced ? "timeout" : "manual",
         },
       });
-      wx.setStorageSync("latestQuizResult", result);
-      wx.navigateTo({
-        url: "/pages/result/index",
+      this.shouldPersistSession = false;
+      getApp().clearActiveQuizSession();
+      getApp().cacheLatestAttempt(result.attempt || null);
+      getApp().markLatestAttemptViewed(result.attempt || null);
+      wx.setStorageSync("latestQuizResult", result.attempt || null);
+      wx.redirectTo({
+        url: `/pages/result/index?attemptId=${encodeURIComponent(result.attempt?.id || "")}`,
       });
     } catch (error) {
       console.error(error);
       wx.showToast({
-        title: "提交失败",
+        title: "提交失敗",
         icon: "none",
       });
       if (this.deadlineAt && Date.now() < this.deadlineAt) {
@@ -283,7 +516,7 @@ Page({
 
   onShareAppMessage() {
     return getApp().createShareOptions({
-      title: `${this.data.paper?.title || "保险刷题"}，一起来练习`,
+      title: `${this.data.paper?.title || "保險刷題"}，一起來練習`,
       path: "/pages/index/index",
     });
   },

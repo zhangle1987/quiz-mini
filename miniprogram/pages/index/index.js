@@ -20,12 +20,22 @@ Page({
     papers: [],
     selectedPaperId: "",
     selectedPaper: null,
+    latestUnlockedAttempt: null,
   },
 
   openIdTapCount: 0,
 
   async onShow() {
     await getApp().waitForBootstrap();
+    this.syncLatestResultEntry();
+    if (this.maybeOpenActiveQuiz()) {
+      this.clearRefreshTimer();
+      return;
+    }
+    if (this.maybeOpenLatestAttempt()) {
+      this.clearRefreshTimer();
+      return;
+    }
     await this.loadConfig();
     this.startAutoRefresh();
   },
@@ -59,17 +69,29 @@ Page({
         selectedPaperId,
         selectedPaper,
       });
+      this.syncLatestResultEntry();
       this.prefetchQuestionBank(selectedPaper);
     } catch (error) {
       console.error(error);
       if (!silent) {
         this.setData({ loading: false });
         wx.showToast({
-          title: "请求失败",
+          title: "請求失敗",
           icon: "none",
         });
       }
     }
+  },
+
+  syncLatestResultEntry() {
+    const preview = getApp().globalData.latestAttemptPreview;
+    const latestUnlockedAttempt = preview?.id && preview?.access?.canViewAnswers
+      ? preview
+      : null;
+
+    this.setData({
+      latestUnlockedAttempt,
+    });
   },
 
   selectPaper(event) {
@@ -106,17 +128,17 @@ Page({
 
     if (!openid) {
       wx.showToast({
-        title: loginWarning || (loginAvailable ? "未获取到 OpenID" : "服务端未开启微信登录"),
+        title: loginWarning || (loginAvailable ? "未取得 OpenID" : "服務端未開啟微信登入"),
         icon: "none",
       });
       return;
     }
 
     wx.showModal({
-      title: "当前用户 OpenID",
+      title: "目前使用者 OpenID",
       content: openid,
-      confirmText: "复制",
-      cancelText: "关闭",
+      confirmText: "複製",
+      cancelText: "關閉",
       success: ({ confirm }) => {
         if (!confirm) {
           return;
@@ -126,13 +148,13 @@ Page({
           data: openid,
           success: () => {
             wx.showToast({
-              title: "OpenID 已复制",
+              title: "OpenID 已複製",
               icon: "none",
             });
           },
           fail: () => {
             wx.showToast({
-              title: "复制失败",
+              title: "複製失敗",
               icon: "none",
             });
           },
@@ -175,11 +197,51 @@ Page({
     }
   },
 
+  maybeOpenLatestAttempt() {
+    if (this.latestAttemptNavigating) {
+      return true;
+    }
+
+    const latestAttempt = getApp().consumeLatestAttemptForAutoOpen();
+    if (!latestAttempt?.id) {
+      return false;
+    }
+
+    this.latestAttemptNavigating = true;
+    wx.navigateTo({
+      url: `/pages/result/index?attemptId=${encodeURIComponent(latestAttempt.id)}`,
+      complete: () => {
+        this.latestAttemptNavigating = false;
+      },
+    });
+    return true;
+  },
+
+  maybeOpenActiveQuiz() {
+    if (this.activeQuizNavigating) {
+      return true;
+    }
+
+    const activeQuizSession = getApp().consumeActiveQuizSessionForAutoOpen();
+    if (!activeQuizSession?.paper?.id) {
+      return false;
+    }
+
+    this.activeQuizNavigating = true;
+    wx.navigateTo({
+      url: `/pages/quiz/index?paperId=${encodeURIComponent(activeQuizSession.paper.id)}&resume=1`,
+      complete: () => {
+        this.activeQuizNavigating = false;
+      },
+    });
+    return true;
+  },
+
   startQuiz() {
     const paper = this.getSelectedPaper();
     if (!paper) {
       wx.showToast({
-        title: "暂无题库",
+        title: "暫無題庫",
         icon: "none",
       });
       return;
@@ -190,9 +252,24 @@ Page({
     });
   },
 
+  openLatestAttempt() {
+    const attemptId = String(this.data.latestUnlockedAttempt?.id || "").trim();
+    if (!attemptId) {
+      wx.showToast({
+        title: "暫無可查看的作答結果",
+        icon: "none",
+      });
+      return;
+    }
+
+    wx.navigateTo({
+      url: `/pages/result/index?attemptId=${encodeURIComponent(attemptId)}`,
+    });
+  },
+
   onShareAppMessage() {
     return getApp().createShareOptions({
-      title: "我在刷保险题，来一起练习",
+      title: "我正在刷保險題，一起來練習",
       path: "/pages/index/index",
     });
   },

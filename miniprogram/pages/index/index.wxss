@@ -147,4 +147,7 @@ page {
 
 .action-row {
   margin-top: 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }

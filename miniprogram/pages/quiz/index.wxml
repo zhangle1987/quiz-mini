@@ -5,18 +5,18 @@
     </view>
     <view class="ui-card__body ui-card__body--tight">
       <view class="meta-row">
-        <view class="ui-tag ui-tag--light">第 {{currentIndex + 1}} / {{questions.length}} 题</view>
-        <view class="ui-tag ui-tag--primary-light">已答 {{answeredCount}} 题</view>
+        <view class="ui-tag ui-tag--light">第 {{currentIndex + 1}} / {{questions.length}} 題</view>
+        <view class="ui-tag ui-tag--primary-light">已答 {{answeredCount}} 題</view>
         <view class="ui-tag ui-tag--danger-light {{remainingSeconds <= 300 ? 'timer-tag--urgent' : ''}}">
-          剩余 {{timerText}}
+          剩餘 {{timerText}}
         </view>
       </view>
       <view class="quiz-summary">
-        本次随机抽取 {{quizConfig.questionCount}} 题，限时 {{quizConfig.durationMinutes}} 分钟，正确率达到 {{quizConfig.passThreshold}}% 为合格
+        本次隨機抽取 {{quizConfig.questionCount}} 題，限時 {{quizConfig.durationMinutes}} 分鐘，正確率達到 {{quizConfig.passThreshold}}% 即為合格
       </view>
       <view class="progress-wrap">
         <view class="progress-meta">
-          <view class="progress-title">答题进度</view>
+          <view class="progress-title">作答進度</view>
           <view class="progress-value">{{answeredCount}} / {{questions.length}}</view>
         </view>
         <view class="progress-track">
@@ -25,8 +25,8 @@
           </view>
         </view>
         <view class="progress-caption">
-          <view class="progress-caption__text">当前进度 {{progressPercent}}%</view>
-          <view class="progress-caption__text">剩余 {{questions.length - answeredCount}} 题</view>
+          <view class="progress-caption__text">目前進度 {{progressPercent}}%</view>
+          <view class="progress-caption__text">剩餘 {{questions.length - answeredCount}} 題</view>
         </view>
       </view>
     </view>
@@ -37,9 +37,9 @@
   <view class="ui-card">
     <view class="ui-card__body">
       <view class="question-head">
-        <view class="question-number">题目 {{questions[currentIndex].number}}</view>
+        <view class="question-number">題目 {{questions[currentIndex].number}}</view>
         <view class="ui-tag ui-tag--light" wx:if="{{questions[currentIndex].reference}}">
-          章节 {{questions[currentIndex].reference}}
+          章節 {{questions[currentIndex].reference}}
         </view>
       </view>
       <view class="question-stem">{{questions[currentIndex].stem}}</view>
@@ -75,18 +75,49 @@
         hover-class="ui-button--hover"
         bindtap="prevQuestion"
         disabled="{{currentIndex === 0}}"
-      >上一题</button>
+      >上一題</button>
       <button
         class="ui-button ui-button--default ui-button--small quiz-nav-button"
         hover-class="ui-button--hover"
         bindtap="nextQuestion"
         disabled="{{currentIndex === questions.length - 1 || !currentQuestionAnswered}}"
-      >下一题</button>
+      >下一題</button>
     </view>
     <view class="submit-row">
-      <button class="ui-button ui-button--primary" loading="{{submitting}}" bindtap="submitQuiz">提交答卷</button>
+      <button class="ui-button ui-button--primary" loading="{{submitting}}" bindtap="prepareSubmit">提交答卷</button>
+    </view>
+  </view>
+
+  <view class="submit-mask" wx:if="{{submitPromptVisible}}">
+    <view class="submit-dialog">
+      <view class="submit-dialog__title">提交答卷</view>
+      <view class="submit-dialog__desc">{{submitPromptMessage}}</view>
+      <form bindsubmit="submitWithNickname">
+        <view class="submit-dialog__field">
+          <view class="submit-dialog__field-label">暱稱</view>
+          <input
+            class="submit-dialog__input"
+            type="nickname"
+            name="nickname"
+            maxlength="20"
+            cursor-spacing="24"
+            placeholder="請輸入暱稱"
+            value="{{submitNickname}}"
+            bindinput="onNicknameInput"
+          />
+          <view class="submit-dialog__hint">可直接填寫，也可使用鍵盤上方顯示的微信暱稱。</view>
+        </view>
+        <view class="submit-dialog__actions">
+          <button class="ui-button ui-button--primary" form-type="submit">填寫暱稱並提交</button>
+          <button
+            wx:if="{{!submitPromptLocked}}"
+            class="ui-button ui-button--default submit-dialog__cancel"
+            bindtap="cancelSubmitPrompt"
+          >再檢查一下</button>
+        </view>
+      </form>
     </view>
   </view>
 </view>
 
-<view class="loading" wx:else>正在加载题目...</view>
+<view class="loading" wx:else>正在載入題目...</view>
