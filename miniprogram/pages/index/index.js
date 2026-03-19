@@ -69,6 +69,7 @@ Page({
         selectedPaperId,
         selectedPaper,
       });
+      getApp().globalData.config = response.config || getApp().globalData.config || null;
       this.syncLatestResultEntry();
       this.prefetchQuestionBank(selectedPaper);
     } catch (error) {

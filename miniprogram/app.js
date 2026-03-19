@@ -351,6 +351,7 @@ App({
       this.globalData.user = response.user || this.globalData.user || null;
       this.globalData.loginAvailable = Boolean(response.loginAvailable);
       this.globalData.loginWarning = response.loginWarning || "";
+      this.globalData.config = response.config || this.globalData.config || null;
       if (response.user) {
         wx.setStorageSync(STORAGE_KEYS.latestUser, response.user);
       }

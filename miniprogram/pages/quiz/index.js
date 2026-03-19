@@ -353,6 +353,7 @@ Page({
     }
 
     const forced = Boolean(options.forced);
+    let requireFriendForAnswers = Boolean(getApp().globalData.config?.requireFriendForAnswers);
 
     try {
       const { openid, loginAvailable, loginWarning } = await getApp().getCurrentOpenId({
@@ -360,6 +361,12 @@ Page({
       });
       if (!openid) {
         throw new Error(loginWarning || (loginAvailable ? "未取得 OpenID" : "服務端未開啟微信登入"));
+      }
+
+      requireFriendForAnswers = Boolean(getApp().globalData.config?.requireFriendForAnswers);
+      if (!requireFriendForAnswers) {
+        await this.submitQuiz({ openid, nickname: "", forced });
+        return;
       }
 
       const friendStatus = String(getApp().globalData.user?.friendStatus || "").trim().toLowerCase();

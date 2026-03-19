@@ -69,7 +69,7 @@
       <view class="broker-card broker-card--framed">
         <view class="broker-title">{{broker.name}}</view>
         <view class="broker-desc">
-          請先加入主考官微信好友，待後台確認後即可查看答案
+          請先加入助考官微信好友，待後台確認後即可查看答案
         </view>
         <image
           class="broker-qr"
